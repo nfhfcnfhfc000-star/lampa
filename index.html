@@ -235,7 +235,7 @@ src="https://www.facebook.com/tr?id=2380551075809526&ev=PageView&noscript=1"
 <!-- ===================== TELEGRAM ===================== -->
 <script>
 var TG_CONFIG = {
-  token:  '8968954499:AAEMKq3Echdhg3rsWocS8IV-8xajFpqckro', 
+  token:  '8968954499:AAH6nxpsxNAuKKvC_T2j3YgUOh0rU44_K0I', 
   chatId: '567800143'   
 };
 </script>
@@ -347,6 +347,18 @@ function trackLead(t,eventId){
   },{eventID:eventId}); /* eventID — для дедуплікації з Conversions API, якщо підключите */
 }
 
+  
+/* Purchase для Facebook: також ЛИШЕ після успішної відправки заявки */
+function trackPurchase(t,eventId){
+  if(typeof fbq!=='function')return;
+  fbq('track','Purchase',{
+    content_name:'Лампа з акумулятором для блекауту',
+    content_type:'product',
+    contents:[{id:'blackout-lamp',quantity:t.qty}],
+    value:t.price,currency:'UAH',num_items:t.qty
+  },{eventID:eventId});
+}
+
 var sending=false;
 var form=document.getElementById('orderForm');
 var sendBtn=form.querySelector('button[type=submit]');
@@ -382,7 +394,9 @@ form.addEventListener('submit',function(e){
     /* УСПІХ: показуємо подяку і тільки тепер шлемо Lead */
     form.style.display='none';
     document.getElementById('thanks').style.display='block';
-    trackLead(t,'lead_'+Date.now());
+      var id=Date.now();
+      trackLead(t,'lead_'+id);
+      trackPurchase(t,'purchase_'+id);
   }).catch(function(err){
     /* ПОМИЛКА: Lead НЕ відправляється */
     console.error(err);
